@@ -11,14 +11,14 @@
  */
 
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.io.File;
-import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -39,7 +39,7 @@ public class DBproject{
 		System.out.print("Connecting to database...");
 		try{
 			// constructs the connection URL
-			String url = "jdbc:postgresql://localhost:" + dbport + "/" + dbname;
+			String url = "jdbc:postgresql://127.0.0.1:" + dbport + "/" + dbname;
 			System.out.println ("Connection URL: " + url + "\n");
 			
 			// obtain a physical connection
@@ -149,6 +149,16 @@ public class DBproject{
 		stmt.close (); 
 		return result; 
 	}//end executeQueryAndReturnResult
+
+	public ResultSet executeQueryAndReturnResultWithColumn (String query) throws SQLException {
+		//creates a statement object
+		Statement stmt = this._connection.createStatement ();
+
+		//issues the query instruction
+		ResultSet rs = stmt.executeQuery (query);
+
+		return rs;
+	}//end executeQueryAndReturnResult
 	
 	/**
 	 * Method to execute an input query SQL instruction (i.e. SELECT).  This
@@ -211,7 +221,8 @@ public class DBproject{
 	 * 
 	 * @param args the command line arguments this inclues the <mysql|pgsql> <login file>
 	 */
-	public static void main (String[] args) {
+	public static <ShipSystemGUI> void main (String[] args) {
+
 		if (args.length != 3) {
 			System.err.println (
 				"Usage: " + "java [-classpath <classpath>] " + DBproject.class.getName () +
@@ -238,10 +249,12 @@ public class DBproject{
 			String dbport = args[1];
 			String user = args[2];
 			
-			esql = new DBproject (dbname, dbport, user, "");
-			
+			esql = new DBproject (dbname, dbport, user, "password");
+			createGui(esql);
+
 			boolean keepon = true;
 			while(keepon){
+
 				System.out.println("MAIN MENU");
 				System.out.println("---------");
 				System.out.println("1. Add Ship");
@@ -277,6 +290,12 @@ public class DBproject{
 				// ignored.
 			}
 		}
+	}
+
+	private static void createGui(DBproject esql) throws IOException, SQLException {
+		GuiFrame mygui = new GuiFrame(esql);
+        mygui.setLocationRelativeTo(null);
+        mygui.setVisible(true);
 	}
 
 	public static int readChoice() {
