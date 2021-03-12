@@ -11,6 +11,8 @@
  */
 
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.DriverManager;
@@ -21,6 +23,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -178,7 +181,7 @@ public class DBproject{
 		int rowCount = 0;
 
 		//iterates through the result set and count nuber of results.
-		if(rs.next()){
+		while(rs.next()){
 			rowCount++;
 		}//end while
 		stmt.close ();
@@ -249,7 +252,7 @@ public class DBproject{
 			String dbport = args[1];
 			String user = args[2];
 			
-			esql = new DBproject (dbname, dbport, user, "password");
+			esql = new DBproject (dbname, dbport, user, "");
 			createGui(esql);
 
 			boolean keepon = true;
@@ -295,7 +298,9 @@ public class DBproject{
 	private static void createGui(DBproject esql) throws IOException, SQLException {
 		GuiFrame mygui = new GuiFrame(esql);
         mygui.setLocationRelativeTo(null);
+		mygui.pack();
         mygui.setVisible(true);
+
 	}
 
 	public static int readChoice() {
@@ -315,6 +320,15 @@ public class DBproject{
 	}//end readChoice
 
 	public static void AddShip(DBproject esql) {//1
+		String sql = "SELECT id FROM ship;";
+		int id = 0;
+		try {
+			id = esql.executeQuery(sql) + 1;
+		} catch (SQLException throwables) {
+			throwables.printStackTrace();
+		}
+		System.out.println(id);
+
 	}
 
 	public static void AddCaptain(DBproject esql) {//2
@@ -341,3 +355,6 @@ public class DBproject{
 		// Find how many passengers there are with a status (i.e. W,C,R) and list that number.
 	}
 }
+
+
+

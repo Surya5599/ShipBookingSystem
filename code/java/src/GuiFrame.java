@@ -1,6 +1,5 @@
 
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -8,21 +7,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Toolkit;
 import javax.swing.JPanel;
 
 public class GuiFrame extends JFrame implements ActionListener{
+
+
     private JPanel mainPanel;
     private JPanel panelHolder;
     private JPanel mainMenu;
@@ -31,23 +28,19 @@ public class GuiFrame extends JFrame implements ActionListener{
     private JButton availableSeatsButton;
     private JPanel Holder;
     private JPanel addShip;
-    private JTextField textField1;
-    private JTextField textField2;
-    private JTextField textField3;
-    private JTextField textField4;
-    private JTextField textField5;
+    private JTextField ship2;
+    private JTextField ship3;
+    private JTextField ship4;
+    private JTextField ship5;
     private JPanel addCaptain;
-    private JTextField textField6;
-    private JTextField textField7;
-    private JTextField textField8;
+    private JTextField captain2;
+    private JTextField captain3;
     private JPanel addCruise;
     private JComboBox addMenuCombo;
     private JPanel addMenu;
-    private JTextField textField9;
-    private JTextField textField10;
-    private JTextField textField11;
-    private JTextField textField12;
-    private JTextField textField13;
+    private JTextField cruise2;
+    private JTextField cruise3;
+    private JTextField cruise4;
     private JComboBox dataMenuCombo;
     private JPanel ContentHolder;
     private JTable table1;
@@ -69,13 +62,26 @@ public class GuiFrame extends JFrame implements ActionListener{
     private JTable shipTable;
     private JComboBox comboBox1;
     private JComboBox comboBox2;
+    private JButton addButton;
+    private JTextField cruise7;
+    private JTextField cruise8;
+    private JPanel topBar;
+    private JPanel dt;
+    private JSpinner Dt_date;
+    private JSpinner Dt_time;
+    private JLabel dep_time;
+    private JPanel at;
+    private JLabel arr_time;
+    private JSpinner at_date;
+    private JSpinner at_time;
+    private JPanel mainMenuPanel;
     private CardLayout cl;
     DBproject sq;
 
     public GuiFrame(DBproject esql) throws SQLException, IOException {
 
         this.sq = esql;
-
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.cl = (CardLayout)panelHolder.getLayout();
         this.add(mainPanel);
         JMenuBar mb = createMenuBar();
@@ -109,6 +115,7 @@ public class GuiFrame extends JFrame implements ActionListener{
         });
 
         initBookingComboBox();
+        createUIComponents();
 
         addDataButton.addActionListener(this);
         bookACruiseButton.addActionListener(this);
@@ -152,6 +159,7 @@ public class GuiFrame extends JFrame implements ActionListener{
         i6.addActionListener(this);
         i7.addActionListener(this);
         menu1.addActionListener(this);
+        addButton.addActionListener(this);
 
         menu2.add(i1);
         menu2.add(i2);
@@ -229,44 +237,186 @@ public class GuiFrame extends JFrame implements ActionListener{
             }
             tableModel.addRow(row);
         }
-
     }
 
-
-
-    public JPanel getPanelHolder(){
-        return panelHolder;
-    }
-
-    public CardLayout getCardLayout(){
-        return cl;
-    }
 
     public void actionPerformed(ActionEvent e) {
         String item = e.getActionCommand();
+        if(item.equals("Submit")){
+            System.out.println(addMenuCombo.getSelectedIndex());
+            int index = addMenuCombo.getSelectedIndex();
+            if(index == 0){
+                if(ship2.getText().isEmpty()
+                        || ship3.getText().isEmpty()
+                        || ship4.getText().isEmpty()
+                        || ship5.getText().isEmpty()){
+                    JOptionPane.showMessageDialog(null, "Please Complete All Fields.");
+                }
+                else{
+                    if( !isNumeric(ship4.getText()) || !isNumeric(ship5.getText()) ){
+                        JOptionPane.showMessageDialog(null, "Please Make Sure That Age and Seats are Integer.");
+                    }
+                    else{
+                        String sql = "SELECT MAX(id) FROM ship;";
+                        int id = 0;
+                        try {
+                            List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+                            int result = Integer.parseInt(rs.get(0).get(0));
+                            id = result + 1;
+                        } catch (SQLException throwables) {
+                            throwables.printStackTrace();
+                        }
+                        sql = "INSERT INTO ship (id, make, model, age, seats) VALUES (" + id + ", '" + ship2.getText() + "', '" + ship3.getText() + "', " + ship4.getText() + ", " + ship5.getText() + ");";
+                        try {
+                            sq.executeUpdate(sql);
+                            JOptionPane.showMessageDialog(null, "Success! Ship Added.");
+                            ship2.setText(null);
+                            ship3.setText(null);
+                            ship4.setText(null);
+                            ship5.setText(null);
+
+                        } catch (SQLException throwables) {
+                            throwables.printStackTrace();
+                            JOptionPane.showMessageDialog(null, "Error. Please try again.");
+                        }
+                        System.out.println(sql);
+                    }
+                }
+            }
+            if(index == 1){
+                if(captain2.getText().isEmpty()
+                        || captain3.getText().isEmpty()){
+                    JOptionPane.showMessageDialog(null, "Please Complete All Fields");
+                }
+                else {
+                    String sql = "SELECT MAX(id) FROM captain;";
+                    int id = 0;
+                    try {
+                        List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+                        int result = Integer.parseInt(rs.get(0).get(0));
+                        id = result + 1;
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
+                    sql = "INSERT INTO captain (id, fullname, nationality) VALUES (" + id + ", '" + captain2.getText() + "', '" + captain3.getText() + "');";
+                    try {
+                        sq.executeUpdate(sql);
+                        JOptionPane.showMessageDialog(null, "Success! Captain Added.");
+                        captain2.setText(null);
+                        captain3.setText(null);
+
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Error. Please try again.");
+                    }
+                    System.out.println(sql);
+                }
+            }
+            if(index == 2){
+                if(cruise2.getText().isEmpty()
+                        || cruise3.getText().isEmpty()
+                        || cruise4.getText().isEmpty()
+                        || cruise7.getText().isEmpty()
+                        || cruise8.getText().isEmpty()){
+                    JOptionPane.showMessageDialog(null, "Please Complete All Fields");
+                }
+                else{
+                    if( !isNumeric(cruise2.getText()) || !isNumeric(cruise3.getText()) || !isNumeric(cruise4.getText())  ){
+                        JOptionPane.showMessageDialog(null, "Please Make Sure That Cost, Tickets Sold and Stops are Integer.");
+                    }
+                    else{
+                        String sql = "SELECT MAX(cnum) FROM cruise;";
+                        int id = 0;
+                        try {
+                            List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+                            int result = Integer.parseInt(rs.get(0).get(0));
+                            id = result + 1;
+                        } catch (SQLException throwables) {
+                            throwables.printStackTrace();
+                        }
+                        sql = "INSERT INTO cruise (cnum, cost, num_sold, num_stops, actual_departure_date, actual_arrival_date, arrival_port, departure_port) VALUES ("
+                                + id + ", "
+                                + cruise2.getText() + ", "
+                                + cruise3.getText() + ", "
+                                + cruise4.getText() + ", '"
+                                + getString(dt) + "', '"
+                                + getString(at) + "', '"
+                                + cruise7.getText() + "', '"
+                                + cruise8.getText() + "');";
+                        System.out.println(sql);
+                        try {
+                            sq.executeUpdate(sql);
+                            JOptionPane.showMessageDialog(null, "Success! Cruise Added.");
+                            cruise2.setText(null);
+                            cruise3.setText(null);
+                            cruise4.setText(null);
+                            cruise7.setText(null);
+                            cruise8.setText(null);
+
+                        } catch (SQLException throwables) {
+                            throwables.printStackTrace();
+                            JOptionPane.showMessageDialog(null, "Error. Please try again.");
+                        }
+
+                    }
+                }
+            }
+        }
+
+
         if(item.equals("Home")){
             cl.show(panelHolder, "mainMenu");
-        }
-        if(item.equals("Add Data")){
+        }if(item.equals("Add Data")){
             cl.show(panelHolder, "addMenu");
-        }
-        if(item.equals("Book a Cruise")){
+        }if(item.equals("Book a Cruise")){
             cl.show(panelHolder, "bookMenu");
-        }
-        if(item.equals("Available Seats")){
+        }if(item.equals("Available Seats")){
             cl.show(panelHolder, "seatsMenu");
         }if(item.equals("Repairs Info")){
             cl.show(panelHolder, "repairMenu");
-        }
-        if(item.equals("Passengers Info")){
+        }if(item.equals("Passengers Info")){
             cl.show(panelHolder, "passengerMenu");
-        }
-        if(item.equals("View Data")){
+        }if(item.equals("View Data")){
             cl.show(panelHolder, "dataMenu");
-        }
-        if(item.equals("Quit")){
+        }if(item.equals("Quit")){
             this.dispose();
         }
     }
+
+    private String getString(JPanel pan) {
+        DateFormat d1 = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat t1 = new SimpleDateFormat("HH:mm");
+        Date date = (Date)((JSpinner)pan.getComponent(0)).getValue();
+        String d = d1.format(date);
+        date = (Date)((JSpinner)pan.getComponent(1)).getValue();
+        String t = t1.format(date);
+        return d + " " + t;
+    }
+
+    public static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch(NumberFormatException e){
+            return false;
+        }
+    }
+
+    private void createUIComponents() {
+        Dt_date = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.MONTH));
+        Dt_time = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.HOUR_OF_DAY));
+        Dt_date.setEditor(new JSpinner.DateEditor(Dt_date, "dd/MM/yy"));
+        Dt_time.setEditor(new JSpinner.DateEditor(Dt_time, "HH:mm"));
+
+        at_date = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.MONTH));
+        at_time = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.HOUR_OF_DAY));
+        at_date.setEditor(new JSpinner.DateEditor(at_date, "dd/MM/yy"));
+        at_time.setEditor(new JSpinner.DateEditor(at_date, "HH:mm"));
+
+    }
 }
+
+
+
+
 
