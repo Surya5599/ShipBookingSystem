@@ -60,8 +60,8 @@ public class GuiFrame extends JFrame implements ActionListener{
     private JComboBox cruiseNumBox;
     private JComboBox dateBox;
     private JTable shipTable;
-    private JComboBox comboBox1;
-    private JComboBox comboBox2;
+    private JComboBox passengerBox1;
+    private JComboBox passengerBox2;
     private JButton addButton;
     private JTextField cruise7;
     private JTextField cruise8;
@@ -75,6 +75,7 @@ public class GuiFrame extends JFrame implements ActionListener{
     private JSpinner at_date;
     private JSpinner at_time;
     private JPanel mainMenuPanel;
+    private JLabel passengerNum;
     private CardLayout cl;
     DBproject sq;
 
@@ -114,7 +115,21 @@ public class GuiFrame extends JFrame implements ActionListener{
             }
         });
 
+        ItemListener passenegerBoxListener = new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    if (passengerBox1.getSelectedItem() == null || passengerBox2.getSelectedItem() == null)
+                        return;
+                    createNumPassengers();
+                }
+            }
+        };
+        passengerBox1.addItemListener(passenegerBoxListener);
+        passengerBox2.addItemListener(passenegerBoxListener);
+
         initBookingComboBox();
+        initPassengerComboBox();
         createUIComponents();
 
         addDataButton.addActionListener(this);
@@ -139,6 +154,25 @@ public class GuiFrame extends JFrame implements ActionListener{
             System.out.println("SQL error in initBookingComboBox()");
             throwables.printStackTrace();
         }
+    }
+
+    private void initPassengerComboBox() {
+        passengerBox1.setEditable(true);
+
+        String sql = "SELECT cnum FROM Cruise";
+        try {
+            List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+            // add all cnums to comboBox
+            for (List<String> ls: rs)
+                passengerBox1.addItem(ls.get(0));
+        } catch (SQLException throwables) {
+            System.out.println("SQL error in initPassengerComboBox()");
+            throwables.printStackTrace();
+        }
+
+        passengerBox2.addItem("Reserved");
+        passengerBox2.addItem("Waitlisted");
+        passengerBox2.addItem("Confirmed");
     }
 
     public JMenuBar createMenuBar(){
@@ -249,6 +283,18 @@ public class GuiFrame extends JFrame implements ActionListener{
                 row.add(result.getString(rsmd.getColumnName(i)));
             }
             tableModel.addRow(row);
+        }
+    }
+
+    public void createNumPassengers() {
+        int cnum = Integer.parseInt(passengerBox1.getSelectedItem().toString());
+        char status = passengerBox2.getSelectedItem().toString().charAt(0);
+        String sql = "SELECT COUNT(rnum) FROM Reservation WHERE cid="+cnum+"AND status='"+status+"';";
+        try {
+            passengerNum.setText(sq.executeQueryAndReturnResult(sql).get(0).get(0));
+        } catch (SQLException throwables) {
+            passengerNum.setText("Not Valid Entries");
+            throwables.printStackTrace();
         }
     }
 
@@ -377,11 +423,11 @@ public class GuiFrame extends JFrame implements ActionListener{
                 JOptionPane.showMessageDialog(null, "Please Complete All Fields");
                 return;
             }
-            int n_reserved, n_ship_seats, cid, ccid, rnum;
+            int cid, ccid, rnum;
             char status;
 
             // set cid (cruise id)
-            cid = Integer.parseInt(bookMenuCombo.getSelectedItem().toString());;
+            cid = Integer.parseInt(bookMenuCombo.getSelectedItem().toString());
 
             // get ccid (customer id)
             String sql = "SELECT c.id FROM Customer c WHERE c.fname='" + bookField1.getText() + "' AND c.lname='" + bookField2.getText() + "';";
@@ -398,7 +444,7 @@ public class GuiFrame extends JFrame implements ActionListener{
             // determine reservation status (RESERVED | WAITLISTED)
             sql = "SELECT num_sold FROM Cruise WHERE cnum="+cid+" UNION SELECT s.seats FROM Ship s WHERE s.id = (SELECT c.ship_id FROM CruiseInfo c WHERE c.cruise_id="+cid+");";
             try {
-                // TODO - send message dialog when customer not found in DB
+                int n_reserved, n_ship_seats;
                 List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
                 n_reserved = Integer.parseInt(rs.get(0).get(0));
                 n_ship_seats = Integer.parseInt(rs.get(1).get(0));
