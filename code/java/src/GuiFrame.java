@@ -53,15 +53,14 @@ public class GuiFrame extends JFrame implements ActionListener{
     private JPanel seatsMenu;
     private JPanel repairMenu;
     private JPanel passengerMenu;
-    private JComboBox bookMenuCombo;
+    private JComboBox<String> bookMenuCombo;
     private JTextField bookField1;
     private JTextField bookField2;
     private JButton bookButton;
-    private JComboBox cruiseNumBox;
-    private JComboBox dateBox;
+    private JComboBox<String> seatCruiseBox;
     private JTable shipTable;
-    private JComboBox passengerBox1;
-    private JComboBox passengerBox2;
+    private JComboBox<String> passengerBox1;
+    private JComboBox<String> passengerBox2;
     private JButton addButton;
     private JTextField cruise7;
     private JTextField cruise8;
@@ -75,7 +74,11 @@ public class GuiFrame extends JFrame implements ActionListener{
     private JSpinner at_date;
     private JSpinner at_time;
     private JPanel mainMenuPanel;
-    private JLabel passengerNum;
+    private JLabel passengerNumField;
+    private JLabel seatNumField;
+    private JButton seatButton;
+    private JSpinner seatDate;
+    private JLabel seatReservedField;
     private CardLayout cl;
     DBproject sq;
 
@@ -115,21 +118,19 @@ public class GuiFrame extends JFrame implements ActionListener{
             }
         });
 
-        ItemListener passenegerBoxListener = new ItemListener() {
+        ItemListener passengerBoxListener = new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (passengerBox1.getSelectedItem() == null || passengerBox2.getSelectedItem() == null)
-                        return;
+                if (e.getStateChange() == ItemEvent.SELECTED)
                     createNumPassengers();
-                }
             }
         };
-        passengerBox1.addItemListener(passenegerBoxListener);
-        passengerBox2.addItemListener(passenegerBoxListener);
+        passengerBox1.addItemListener(passengerBoxListener);
+        passengerBox2.addItemListener(passengerBoxListener);
 
         initBookingComboBox();
         initPassengerComboBox();
+        initSeatComboBox();
         createUIComponents();
 
         addDataButton.addActionListener(this);
@@ -140,6 +141,11 @@ public class GuiFrame extends JFrame implements ActionListener{
         allDataButton.addActionListener(this);
         quitButton.addActionListener(this);
 
+
+        seatButton.addActionListener(this);
+        seatButton.setActionCommand("seatButton");
+        bookButton.addActionListener(this);
+        bookButton.setActionCommand("bookButton");
     }
 
     private void initBookingComboBox() {
@@ -172,7 +178,22 @@ public class GuiFrame extends JFrame implements ActionListener{
 
         passengerBox2.addItem("Reserved");
         passengerBox2.addItem("Waitlisted");
-        passengerBox2.addItem("Confirmed");
+        passengerBox2.addItem("Completed");
+    }
+
+    private void initSeatComboBox() {
+        seatCruiseBox.setEditable(true);
+
+        String sql = "SELECT cnum FROM Cruise";
+        try {
+            List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+            // add all cnums to comboBox
+            for (List<String> ls: rs)
+                seatCruiseBox.addItem(ls.get(0));
+        } catch (SQLException throwables) {
+            System.out.println("SQL error in initSeatComboBox()");
+            throwables.printStackTrace();
+        }
     }
 
     public JMenuBar createMenuBar(){
@@ -203,10 +224,7 @@ public class GuiFrame extends JFrame implements ActionListener{
         i7.addActionListener(this);
         menu1.addActionListener(this);
         addButton.addActionListener(this);
-        bookButton.addActionListener(this);
-
         addButton.setActionCommand("addButton");
-        bookButton.setActionCommand("bookButton");
 
         menu2.add(i1);
         menu2.add(i2);
@@ -221,7 +239,7 @@ public class GuiFrame extends JFrame implements ActionListener{
         return jb;
     }
 
-    private void showTable(String item) {
+    public void showTable(String item) {
         CardLayout cl = (CardLayout)Holder.getLayout();
         if(item.equals("Ship")) {
             cl.show(Holder, "addShip");
@@ -287,13 +305,15 @@ public class GuiFrame extends JFrame implements ActionListener{
     }
 
     public void createNumPassengers() {
+        if (passengerBox1.getSelectedItem() == null || passengerBox2.getSelectedItem() == null)
+            return;
         int cnum = Integer.parseInt(passengerBox1.getSelectedItem().toString());
         char status = passengerBox2.getSelectedItem().toString().charAt(0);
         String sql = "SELECT COUNT(rnum) FROM Reservation WHERE cid="+cnum+"AND status='"+status+"';";
         try {
-            passengerNum.setText(sq.executeQueryAndReturnResult(sql).get(0).get(0));
+            passengerNumField.setText(sq.executeQueryAndReturnResult(sql).get(0).get(0));
         } catch (SQLException throwables) {
-            passengerNum.setText("Not Valid Entries");
+            passengerNumField.setText("Not Valid Entries");
             throwables.printStackTrace();
         }
     }
@@ -301,50 +321,44 @@ public class GuiFrame extends JFrame implements ActionListener{
 
     public void actionPerformed(ActionEvent e) {
         String item = e.getActionCommand();
-        if(item.equals("addButton")) {
-            int index = addMenuCombo.getSelectedIndex();
-            if (index == 0) {
-                if (ship2.getText().isEmpty()
-                        || ship3.getText().isEmpty()
-                        || ship4.getText().isEmpty()
-                        || ship5.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Please Complete All Fields.");
-                } else {
-                    if (!isNumeric(ship4.getText()) || !isNumeric(ship5.getText())) {
-                        JOptionPane.showMessageDialog(null, "Please Make Sure That Age and Seats are Integer.");
-                    } else {
-                        String sql = "SELECT MAX(id) FROM ship;";
-                        int id = 0;
-                        try {
-                            List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
-                            int result = Integer.parseInt(rs.get(0).get(0));
-                            id = result + 1;
-                        } catch (SQLException throwables) {
-                            throwables.printStackTrace();
-                        }
-                        sql = "INSERT INTO ship (id, make, model, age, seats) VALUES (" + id + ", '" + ship2.getText() + "', '" + ship3.getText() + "', " + ship4.getText() + ", " + ship5.getText() + ");";
-                        try {
-                            sq.executeUpdate(sql);
-                            JOptionPane.showMessageDialog(null, "Success! Ship Added.");
-                            ship2.setText(null);
-                            ship3.setText(null);
-                            ship4.setText(null);
-                            ship5.setText(null);
+        if(item.equals("addButton"))
+            addData();
+        else if (item.equals("bookButton"))
+            bookCruise();
+        else if (item.equals("seatButton"))
+            findNumSeats();
 
-                        } catch (SQLException throwables) {
-                            throwables.printStackTrace();
-                            JOptionPane.showMessageDialog(null, "Error. Please try again.");
-                        }
-                        System.out.println(sql);
-                    }
-                }
-            }
-            if (index == 1) {
-                if (captain2.getText().isEmpty()
-                        || captain3.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Please Complete All Fields");
+        if(item.equals("Home"))
+            cl.show(panelHolder, "mainMenu");
+        else if(item.equals("Add Data"))
+            cl.show(panelHolder, "addMenu");
+        else if(item.equals("Book a Cruise"))
+            cl.show(panelHolder, "bookMenu");
+        else if(item.equals("Available Seats"))
+            cl.show(panelHolder, "seatsMenu");
+        else if(item.equals("Repairs Info"))
+            cl.show(panelHolder, "repairMenu");
+        else if(item.equals("Passengers Info"))
+            cl.show(panelHolder, "passengerMenu");
+        else if(item.equals("View Data"))
+            cl.show(panelHolder, "dataMenu");
+        else if(item.equals("Quit"))
+            this.dispose();
+    }
+
+    public void addData() {
+        int index = addMenuCombo.getSelectedIndex();
+        if (index == 0) {
+            if (ship2.getText().isEmpty()
+                    || ship3.getText().isEmpty()
+                    || ship4.getText().isEmpty()
+                    || ship5.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Please Complete All Fields.");
+            } else {
+                if (!isNumeric(ship4.getText()) || !isNumeric(ship5.getText())) {
+                    JOptionPane.showMessageDialog(null, "Please Make Sure That Age and Seats are Integer.");
                 } else {
-                    String sql = "SELECT MAX(id) FROM captain;";
+                    String sql = "SELECT MAX(id) FROM ship;";
                     int id = 0;
                     try {
                         List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
@@ -353,12 +367,14 @@ public class GuiFrame extends JFrame implements ActionListener{
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
                     }
-                    sql = "INSERT INTO captain (id, fullname, nationality) VALUES (" + id + ", '" + captain2.getText() + "', '" + captain3.getText() + "');";
+                    sql = "INSERT INTO ship (id, make, model, age, seats) VALUES (" + id + ", '" + ship2.getText() + "', '" + ship3.getText() + "', " + ship4.getText() + ", " + ship5.getText() + ");";
                     try {
                         sq.executeUpdate(sql);
-                        JOptionPane.showMessageDialog(null, "Success! Captain Added.");
-                        captain2.setText(null);
-                        captain3.setText(null);
+                        JOptionPane.showMessageDialog(null, "Success! Ship Added.");
+                        ship2.setText(null);
+                        ship3.setText(null);
+                        ship4.setText(null);
+                        ship5.setText(null);
 
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
@@ -367,157 +383,198 @@ public class GuiFrame extends JFrame implements ActionListener{
                     System.out.println(sql);
                 }
             }
-            if (index == 2) {
-                if (cruise2.getText().isEmpty()
-                        || cruise3.getText().isEmpty()
-                        || cruise4.getText().isEmpty()
-                        || cruise7.getText().isEmpty()
-                        || cruise8.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Please Complete All Fields");
-                } else {
-                    if (!isNumeric(cruise2.getText()) || !isNumeric(cruise3.getText()) || !isNumeric(cruise4.getText())) {
-                        JOptionPane.showMessageDialog(null, "Please Make Sure That Cost, Tickets Sold and Stops are Integer.");
-                    } else {
-                        String sql = "SELECT MAX(cnum) FROM cruise;";
-                        int id = 0;
-                        try {
-                            List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
-                            int result = Integer.parseInt(rs.get(0).get(0));
-                            id = result + 1;
-                        } catch (SQLException throwables) {
-                            throwables.printStackTrace();
-                        }
-                        sql = "INSERT INTO cruise (cnum, cost, num_sold, num_stops, actual_departure_date, actual_arrival_date, arrival_port, departure_port) VALUES ("
-                                + id + ", "
-                                + cruise2.getText() + ", "
-                                + cruise3.getText() + ", "
-                                + cruise4.getText() + ", '"
-                                + getString(dt) + "', '"
-                                + getString(at) + "', '"
-                                + cruise7.getText() + "', '"
-                                + cruise8.getText() + "');";
-                        System.out.println(sql);
-                        try {
-                            sq.executeUpdate(sql);
-                            JOptionPane.showMessageDialog(null, "Success! Cruise Added.");
-                            cruise2.setText(null);
-                            cruise3.setText(null);
-                            cruise4.setText(null);
-                            cruise7.setText(null);
-                            cruise8.setText(null);
+        }
+        if (index == 1) {
+            if (captain2.getText().isEmpty()
+                    || captain3.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Please Complete All Fields");
+            } else {
+                String sql = "SELECT MAX(id) FROM captain;";
+                int id = 0;
+                try {
+                    List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+                    int result = Integer.parseInt(rs.get(0).get(0));
+                    id = result + 1;
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+                sql = "INSERT INTO captain (id, fullname, nationality) VALUES (" + id + ", '" + captain2.getText() + "', '" + captain3.getText() + "');";
+                try {
+                    sq.executeUpdate(sql);
+                    JOptionPane.showMessageDialog(null, "Success! Captain Added.");
+                    captain2.setText(null);
+                    captain3.setText(null);
 
-                        } catch (SQLException throwables) {
-                            throwables.printStackTrace();
-                            JOptionPane.showMessageDialog(null, "Error. Please try again.");
-                        }
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error. Please try again.");
+                }
+                System.out.println(sql);
+            }
+        }
+        if (index == 2) {
+            if (cruise2.getText().isEmpty()
+                    || cruise3.getText().isEmpty()
+                    || cruise4.getText().isEmpty()
+                    || cruise7.getText().isEmpty()
+                    || cruise8.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Please Complete All Fields");
+            } else {
+                if (!isNumeric(cruise2.getText()) || !isNumeric(cruise3.getText()) || !isNumeric(cruise4.getText())) {
+                    JOptionPane.showMessageDialog(null, "Please Make Sure That Cost, Tickets Sold and Stops are Integer.");
+                } else {
+                    String sql = "SELECT MAX(cnum) FROM cruise;";
+                    int id = 0;
+                    try {
+                        List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+                        int result = Integer.parseInt(rs.get(0).get(0));
+                        id = result + 1;
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
+                    sql = "INSERT INTO cruise (cnum, cost, num_sold, num_stops, actual_departure_date, actual_arrival_date, arrival_port, departure_port) VALUES ("
+                            + id + ", "
+                            + cruise2.getText() + ", "
+                            + cruise3.getText() + ", "
+                            + cruise4.getText() + ", '"
+                            + getString(dt) + "', '"
+                            + getString(at) + "', '"
+                            + cruise7.getText() + "', '"
+                            + cruise8.getText() + "');";
+                    System.out.println(sql);
+                    try {
+                        sq.executeUpdate(sql);
+                        JOptionPane.showMessageDialog(null, "Success! Cruise Added.");
+                        cruise2.setText(null);
+                        cruise3.setText(null);
+                        cruise4.setText(null);
+                        cruise7.setText(null);
+                        cruise8.setText(null);
+
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Error. Please try again.");
                     }
                 }
             }
-        } // end addButton
-        else if (item.equals("bookButton")) {
-            // ensure all fields are entered
-            System.out.println(bookMenuCombo.getSelectedItem());
-            if (bookField1.getText().isEmpty()
-                    || bookField2.getText().isEmpty()
-                    || bookMenuCombo.getSelectedItem() == null) {
-                JOptionPane.showMessageDialog(null, "Please Complete All Fields");
-                return;
-            }
-            int cid, ccid, rnum;
-            char status;
-
-            // set cid (cruise id)
-            cid = Integer.parseInt(bookMenuCombo.getSelectedItem().toString());
-
-            // get ccid (customer id)
-            String sql = "SELECT c.id FROM Customer c WHERE c.fname='" + bookField1.getText() + "' AND c.lname='" + bookField2.getText() + "';";
-            try {
-                // TODO - send message dialog when customer not found in DB
-                List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
-                ccid = Integer.parseInt(rs.get(0).get(0));
-            } catch (SQLException throwables) {
-                JOptionPane.showMessageDialog(null, "Could not find customer");
-                throwables.printStackTrace();
-                return;
-            }
-
-            // determine reservation status (RESERVED | WAITLISTED)
-            sql = "SELECT num_sold FROM Cruise WHERE cnum="+cid+" UNION SELECT s.seats FROM Ship s WHERE s.id = (SELECT c.ship_id FROM CruiseInfo c WHERE c.cruise_id="+cid+");";
-            try {
-                int n_reserved, n_ship_seats;
-                List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
-                n_reserved = Integer.parseInt(rs.get(0).get(0));
-                n_ship_seats = Integer.parseInt(rs.get(1).get(0));
-                if (n_reserved >= n_ship_seats)
-                    status = 'W';
-                else
-                    status = 'R';
-            } catch (SQLException throwables) {
-                JOptionPane.showMessageDialog(null, "Could not retrieve Cruise info (internal error)");
-                throwables.printStackTrace();
-                return;
-            }
-
-            // get rnum
-            sql = "SELECT MAX(rnum) FROM Reservation;";
-            try {
-                List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
-                rnum = Integer.parseInt(rs.get(0).get(0)) + 1;
-            } catch (SQLException throwables) {
-                JOptionPane.showMessageDialog(null, "Could not retrieve reservation info (internal error)");
-                throwables.printStackTrace();
-                return;
-            }
-
-            // INSERT reservation
-            sql = "INSERT INTO Reservation (rnum, cid, ccid, status) VALUES ("
-                    + rnum + ","
-                    + cid + ","
-                    + ccid + ",'"
-                    + status + "');";
-            try {
-                sq.executeUpdate(sql);
-                if (status == 'R')
-                    JOptionPane.showMessageDialog(null, "Reservation successfully booked");
-                else
-                    JOptionPane.showMessageDialog(null, "Your were placed on the waitlist");
-                bookField1.setText(null);
-                bookField2.setText(null);
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Error. Please try again.");
-                return;
-            }
-
-            // update num_sold
-            sql = "UPDATE Cruise SET num_sold=num_sold+1 WHERE cnum="+cid+";";
-            try {
-                sq.executeUpdate(sql);
-            } catch (SQLException throwables) {
-                JOptionPane.showMessageDialog(null, "Could update Cruise info (internal error)");
-                throwables.printStackTrace();
-                return;
-            }
-            System.out.println(sql);
-        } // end bookButton
-
-        if(item.equals("Home")){
-            cl.show(panelHolder, "mainMenu");
-        }if(item.equals("Add Data")){
-            cl.show(panelHolder, "addMenu");
-        }if(item.equals("Book a Cruise")){
-            cl.show(panelHolder, "bookMenu");
-        }if(item.equals("Available Seats")){
-            cl.show(panelHolder, "seatsMenu");
-        }if(item.equals("Repairs Info")){
-            cl.show(panelHolder, "repairMenu");
-        }if(item.equals("Passengers Info")){
-            cl.show(panelHolder, "passengerMenu");
-        }if(item.equals("View Data")){
-            cl.show(panelHolder, "dataMenu");
-        }if(item.equals("Quit")){
-            this.dispose();
         }
+    }
+
+    public void bookCruise() {
+        // ensure all fields are entered
+        System.out.println(bookMenuCombo.getSelectedItem());
+        if (bookField1.getText().isEmpty()
+                || bookField2.getText().isEmpty()
+                || bookMenuCombo.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(null, "Please Complete All Fields");
+            return;
+        }
+        int cid, ccid, rnum;
+        char status;
+
+        // set cid (cruise id)
+        cid = Integer.parseInt(bookMenuCombo.getSelectedItem().toString());
+
+        // get ccid (customer id)
+        String sql = "SELECT c.id FROM Customer c WHERE c.fname='" + bookField1.getText() + "' AND c.lname='" + bookField2.getText() + "';";
+        try {
+            // TODO - send message dialog when customer not found in DB
+            List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+            ccid = Integer.parseInt(rs.get(0).get(0));
+        } catch (SQLException throwables) {
+            JOptionPane.showMessageDialog(null, "Could not find customer");
+            throwables.printStackTrace();
+            return;
+        }
+
+        // determine reservation status (RESERVED | WAITLISTED)
+        sql = "SELECT num_sold FROM Cruise WHERE cnum="+cid+" UNION SELECT s.seats FROM Ship s WHERE s.id = (SELECT c.ship_id FROM CruiseInfo c WHERE c.cruise_id="+cid+");";
+        try {
+            int n_reserved, n_ship_seats;
+            List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+            n_reserved = Integer.parseInt(rs.get(0).get(0));
+            n_ship_seats = Integer.parseInt(rs.get(1).get(0));
+            if (n_reserved >= n_ship_seats)
+                status = 'W';
+            else
+                status = 'R';
+        } catch (SQLException throwables) {
+            JOptionPane.showMessageDialog(null, "Could not retrieve Cruise info (internal error)");
+            throwables.printStackTrace();
+            return;
+        }
+
+        // get rnum
+        sql = "SELECT MAX(rnum) FROM Reservation;";
+        try {
+            List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+            rnum = Integer.parseInt(rs.get(0).get(0)) + 1;
+        } catch (SQLException throwables) {
+            JOptionPane.showMessageDialog(null, "Could not retrieve reservation info (internal error)");
+            throwables.printStackTrace();
+            return;
+        }
+
+        // INSERT reservation
+        sql = "INSERT INTO Reservation (rnum, cid, ccid, status) VALUES ("
+                + rnum + ","
+                + cid + ","
+                + ccid + ",'"
+                + status + "');";
+        try {
+            sq.executeUpdate(sql);
+            if (status == 'R')
+                JOptionPane.showMessageDialog(null, "Reservation successfully booked");
+            else
+                JOptionPane.showMessageDialog(null, "Your were placed on the waitlist");
+            bookField1.setText(null);
+            bookField2.setText(null);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error. Please try again.");
+            return;
+        }
+
+        // update num_sold
+        sql = "UPDATE Cruise SET num_sold=num_sold+1 WHERE cnum="+cid+";";
+        try {
+            sq.executeUpdate(sql);
+        } catch (SQLException throwables) {
+            JOptionPane.showMessageDialog(null, "Could update Cruise info (internal error)");
+            throwables.printStackTrace();
+            return;
+        }
+        System.out.println(sql);
+    }
+
+    private void findNumSeats() {
+        // ensure all fields are entered
+        if (seatDate.getValue() == null || seatCruiseBox.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(null, "Please Complete All Fields");
+            return;
+        }
+
+        int cnum = Integer.parseInt(seatCruiseBox.getSelectedItem().toString());
+        int n_reserved = 0, n_ship_seats = 0;
+
+        // find num_sold, # of seats
+        String sql = "SELECT num_sold FROM Cruise WHERE cnum="+cnum
+                +" UNION "
+                +"SELECT s.seats FROM Ship s WHERE s.id = (SELECT c.ship_id FROM CruiseInfo c WHERE c.cruise_id="+cnum
+                +");";
+        try {
+            List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+            n_reserved = Integer.parseInt(rs.get(0).get(0));
+            n_ship_seats = Integer.parseInt(rs.get(1).get(0));
+        } catch (SQLException throwables) {
+            JOptionPane.showMessageDialog(null, "Could not retrieve Cruise info (internal error)");
+            throwables.printStackTrace();
+            return;
+        }
+        System.out.println(sql);
+
+        seatNumField.setText(String.valueOf(n_ship_seats - n_reserved));
+        seatReservedField.setText(n_reserved+" / "+n_ship_seats);
     }
 
     private String getString(JPanel pan) {
@@ -550,6 +607,10 @@ public class GuiFrame extends JFrame implements ActionListener{
         at_date.setEditor(new JSpinner.DateEditor(at_date, "dd/MM/yy"));
         at_time.setEditor(new JSpinner.DateEditor(at_date, "HH:mm"));
 
+        seatDate = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.MONTH));
+        //seatTime = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.HOUR_OF_DAY));
+        seatDate.setEditor(new JSpinner.DateEditor(at_date, "dd/MM/yy"));
+        //seatTime.setEditor(new JSpinner.DateEditor(at_date, "HH:mm"));
     }
 }
 
