@@ -55,7 +55,7 @@ public class GuiFrame extends JFrame implements ActionListener{
     private JPanel passengerMenu;
     private JComboBox bookMenuBox;
     private JTextField textField14;
-    private JButton button1;
+    private JButton bookButton;
     private JTextField textField15;
     private JComboBox cruiseNumBox;
     private JComboBox dateBox;
@@ -160,6 +160,10 @@ public class GuiFrame extends JFrame implements ActionListener{
         i7.addActionListener(this);
         menu1.addActionListener(this);
         addButton.addActionListener(this);
+        bookButton.addActionListener(this);
+
+        addButton.setActionCommand("addButton");
+        bookButton.setActionCommand("bookButton");
 
         menu2.add(i1);
         menu2.add(i2);
@@ -242,21 +246,18 @@ public class GuiFrame extends JFrame implements ActionListener{
 
     public void actionPerformed(ActionEvent e) {
         String item = e.getActionCommand();
-        if(item.equals("Submit")){
-            System.out.println(addMenuCombo.getSelectedIndex());
+        if(item.equals("addButton")) {
             int index = addMenuCombo.getSelectedIndex();
-            if(index == 0){
-                if(ship2.getText().isEmpty()
+            if (index == 0) {
+                if (ship2.getText().isEmpty()
                         || ship3.getText().isEmpty()
                         || ship4.getText().isEmpty()
-                        || ship5.getText().isEmpty()){
+                        || ship5.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Please Complete All Fields.");
-                }
-                else{
-                    if( !isNumeric(ship4.getText()) || !isNumeric(ship5.getText()) ){
+                } else {
+                    if (!isNumeric(ship4.getText()) || !isNumeric(ship5.getText())) {
                         JOptionPane.showMessageDialog(null, "Please Make Sure That Age and Seats are Integer.");
-                    }
-                    else{
+                    } else {
                         String sql = "SELECT MAX(id) FROM ship;";
                         int id = 0;
                         try {
@@ -283,12 +284,11 @@ public class GuiFrame extends JFrame implements ActionListener{
                     }
                 }
             }
-            if(index == 1){
-                if(captain2.getText().isEmpty()
-                        || captain3.getText().isEmpty()){
+            if (index == 1) {
+                if (captain2.getText().isEmpty()
+                        || captain3.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Please Complete All Fields");
-                }
-                else {
+                } else {
                     String sql = "SELECT MAX(id) FROM captain;";
                     int id = 0;
                     try {
@@ -312,19 +312,17 @@ public class GuiFrame extends JFrame implements ActionListener{
                     System.out.println(sql);
                 }
             }
-            if(index == 2){
-                if(cruise2.getText().isEmpty()
+            if (index == 2) {
+                if (cruise2.getText().isEmpty()
                         || cruise3.getText().isEmpty()
                         || cruise4.getText().isEmpty()
                         || cruise7.getText().isEmpty()
-                        || cruise8.getText().isEmpty()){
+                        || cruise8.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Please Complete All Fields");
-                }
-                else{
-                    if( !isNumeric(cruise2.getText()) || !isNumeric(cruise3.getText()) || !isNumeric(cruise4.getText())  ){
+                } else {
+                    if (!isNumeric(cruise2.getText()) || !isNumeric(cruise3.getText()) || !isNumeric(cruise4.getText())) {
                         JOptionPane.showMessageDialog(null, "Please Make Sure That Cost, Tickets Sold and Stops are Integer.");
-                    }
-                    else{
+                    } else {
                         String sql = "SELECT MAX(cnum) FROM cruise;";
                         int id = 0;
                         try {
@@ -357,12 +355,13 @@ public class GuiFrame extends JFrame implements ActionListener{
                             throwables.printStackTrace();
                             JOptionPane.showMessageDialog(null, "Error. Please try again.");
                         }
-
                     }
                 }
             }
-        }
-
+        } // end addButton
+        else if (item.equals("bookButton")) {
+            System.out.println("bookButton pressed");
+        } // end bookButton
 
         if(item.equals("Home")){
             cl.show(panelHolder, "mainMenu");

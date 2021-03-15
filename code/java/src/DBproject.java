@@ -328,7 +328,6 @@ public class DBproject{
 			throwables.printStackTrace();
 		}
 		System.out.println(id);
-
 	}
 
 	public static void AddCaptain(DBproject esql) {//2
