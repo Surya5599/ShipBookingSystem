@@ -79,6 +79,13 @@ public class GuiFrame extends JFrame implements ActionListener{
     private JButton seatButton;
     private JSpinner seatDate;
     private JLabel seatReservedField;
+    private JLabel costInfo;
+    private JLabel soldInfo;
+    private JLabel stopInfo;
+    private JLabel dDate;
+    private JLabel aDate;
+    private JLabel aPort;
+    private JLabel dPort;
     private CardLayout cl;
     DBproject sq;
 
@@ -111,6 +118,20 @@ public class GuiFrame extends JFrame implements ActionListener{
                     String item = (String) e.getItem();
                     try {
                         createTable(item);
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        bookMenuCombo.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    int item = Integer.parseInt((String) e.getItem());
+                    try {
+                        fillCruiseInfo(item);
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
                     }
@@ -151,15 +172,32 @@ public class GuiFrame extends JFrame implements ActionListener{
     private void initBookingComboBox() {
         bookMenuCombo.setEditable(true);
         String sql = "SELECT cnum FROM Cruise";
+        List<String> first = null;
         try {
             List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
             // add all cnums to comboBox
             for (List<String> ls: rs)
                 bookMenuCombo.addItem(ls.get(0));
+            fillCruiseInfo(0);
         } catch (SQLException throwables) {
             System.out.println("SQL error in initBookingComboBox()");
             throwables.printStackTrace();
         }
+    }
+
+    private void fillCruiseInfo(int x) throws SQLException {
+        String sql = "SELECT * FROM Cruise where cnum = " + x;
+        List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+        List<String> first = rs.get(0);
+        costInfo.setText(String.valueOf(first.get(1)));
+        soldInfo.setText(String.valueOf(first.get(2)));
+        stopInfo.setText(String.valueOf(first.get(3)));
+        dDate.setText(String.valueOf(first.get(4)));
+        aDate.setText(String.valueOf(first.get(5)));
+        aPort.setText(String.valueOf(first.get(6)));
+        dPort.setText(String.valueOf(first.get(7)));
+
+
     }
 
     private void initPassengerComboBox() {
@@ -336,14 +374,43 @@ public class GuiFrame extends JFrame implements ActionListener{
             cl.show(panelHolder, "bookMenu");
         else if(item.equals("Available Seats"))
             cl.show(panelHolder, "seatsMenu");
-        else if(item.equals("Repairs Info"))
+        else if(item.equals("Repairs Info")){
             cl.show(panelHolder, "repairMenu");
+            try {
+                showRepairsList();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
         else if(item.equals("Passengers Info"))
             cl.show(panelHolder, "passengerMenu");
         else if(item.equals("View Data"))
             cl.show(panelHolder, "dataMenu");
         else if(item.equals("Quit"))
             this.dispose();
+    }
+
+    private void showRepairsList() throws SQLException {
+        String sql = "SELECT R.ship_id, COUNT(R.ship_id) as total_repairs, S.make, S.model, S.age, S.seats from repairs R, ship S WHERE S.id = R.ship_id GROUP BY R.ship_id, S.make, S.model,S.seats, S.age ORDER BY COUNT(R.ship_id) desc;";
+        ResultSet result = sq.executeQueryAndReturnResultWithColumn(sql);
+        ResultSetMetaData rsmd = result.getMetaData();
+        DefaultTableModel tableModel = (DefaultTableModel) shipTable.getModel();
+        shipTable.setEnabled(false);
+        tableModel.setRowCount(0);
+        tableModel.setColumnCount(0);
+        int columnCount = rsmd.getColumnCount();
+        List<String> columnNames = new ArrayList<>();
+        for (int i = 1; i <= columnCount; i++) {
+            tableModel.addColumn(rsmd.getColumnName(i));
+            columnNames.add(rsmd.getColumnName(i));
+        }
+        while (result.next()) {
+            Vector<String> row = new Vector<>();
+            for(int i = 1; i <= columnCount; i++){
+                row.add(result.getString(rsmd.getColumnName(i)));
+            }
+            tableModel.addRow(row);
+        }
     }
 
     public void addData() {

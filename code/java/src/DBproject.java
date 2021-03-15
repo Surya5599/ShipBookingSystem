@@ -345,8 +345,10 @@ public class DBproject{
 		// For Cruise number and date, find the number of availalbe seats (i.e. total Ship capacity minus booked seats )
 	}
 
-	public static void ListsTotalNumberOfRepairsPerShip(DBproject esql) {//6
+	public static void ListsTotalNumberOfRepairsPerShip(DBproject esql) throws SQLException {//6
 		// Count number of repairs per Ships and list them in descending order
+		String sql = "SELECT repairs.ship_id, COUNT(*) FROM repairs as sub GROUP BY ship_id INNER JOIN (SELECT * FROM ship) ON ship.id = sub.ship_id;";
+		esql.executeQueryAndPrintResult(sql);
 	}
 
 	
