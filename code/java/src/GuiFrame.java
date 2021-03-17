@@ -547,7 +547,12 @@ public class GuiFrame extends JFrame implements ActionListener{
         try {
             // TODO - send message dialog when customer not found in DB
             List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
-            ccid = Integer.parseInt(rs.get(0).get(0));
+            try {
+                ccid = Integer.parseInt(rs.get(0).get(0));
+            } catch(Exception e) {
+                JOptionPane.showMessageDialog(null, "Customer does not exist. Please create customer first");
+                return;
+            }
         } catch (SQLException throwables) {
             JOptionPane.showMessageDialog(null, "Could not find customer");
             throwables.printStackTrace();
