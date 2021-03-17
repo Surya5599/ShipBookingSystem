@@ -51,8 +51,8 @@ CREATE TABLE Cruise
 	cost _PINTEGER NOT NULL,
 	num_sold _PZEROINTEGER NOT NULL,
 	num_stops _PZEROINTEGER NOT NULL,
-	actual_departure_date DATE NOT NULL,
-	actual_arrival_date DATE NOT NULL,
+	actual_departure_date TIMESTAMP NOT NULL,
+	actual_arrival_date TIMESTAMP NOT NULL,
 	arrival_port CHAR(5) NOT NULL,-- PORT CODE --
 	departure_port CHAR(5) NOT NULL,-- PORT CODE --
 	PRIMARY KEY (cnum)
@@ -120,8 +120,8 @@ CREATE TABLE Schedule
 (
 	id INTEGER NOT NULL,
 	cruiseNum INTEGER NOT NULL,
-	departure_time DATE NOT NULL,
-	arrival_time DATE NOT NULL,
+	departure_time TIMESTAMP NOT NULL,
+	arrival_time TIMESTAMP NOT NULL,
 	PRIMARY KEY (id),
 	FOREIGN KEY (cruiseNum) REFERENCES Cruise(cnum)
 );
