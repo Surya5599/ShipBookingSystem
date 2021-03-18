@@ -86,6 +86,8 @@ public class GuiFrame extends JFrame implements ActionListener{
     private JLabel aDate;
     private JLabel aPort;
     private JLabel dPort;
+    private JComboBox addCruiseShipBox;
+    private JComboBox addCruiseCaptainBox;
     private CardLayout cl;
     DBproject sq;
 
@@ -149,6 +151,7 @@ public class GuiFrame extends JFrame implements ActionListener{
         passengerBox1.addItemListener(passengerBoxListener);
         passengerBox2.addItemListener(passengerBoxListener);
 
+        initAddCruiseComboBoxes();
         initBookingComboBox();
         initPassengerComboBox();
         initSeatComboBox();
@@ -169,10 +172,34 @@ public class GuiFrame extends JFrame implements ActionListener{
         bookButton.setActionCommand("bookButton");
     }
 
+    private void initAddCruiseComboBoxes() {
+        addCruiseShipBox.setEditable(true);
+        addCruiseCaptainBox.setEditable(true);
+        String sql = "SELECT cnum FROM Cruise";
+        try {
+            List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+            // add all cnums to comboBox
+            for (List<String> ls: rs)
+                addCruiseShipBox.addItem(ls.get(0));
+        } catch (SQLException throwables) {
+            System.out.println("SQL error in initAddCruiseComboBoxes()");
+            throwables.printStackTrace();
+        }
+        sql = "SELECT fullname FROM Captain";
+        try {
+            List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+            // add all names to comboBox
+            for (List<String> ls: rs)
+                addCruiseCaptainBox.addItem(ls.get(0));
+        } catch (SQLException throwables) {
+            System.out.println("SQL error in initAddCruiseComboBoxes()");
+            throwables.printStackTrace();
+        }
+    }
+
     private void initBookingComboBox() {
         bookMenuCombo.setEditable(true);
         String sql = "SELECT cnum FROM Cruise";
-        List<String> first = null;
         try {
             List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
             // add all cnums to comboBox
@@ -438,16 +465,20 @@ public class GuiFrame extends JFrame implements ActionListener{
                     try {
                         sq.executeUpdate(sql);
                         JOptionPane.showMessageDialog(null, "Success! Ship Added.");
-                        ship2.setText(null);
-                        ship3.setText(null);
-                        ship4.setText(null);
-                        ship5.setText(null);
-
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
                         JOptionPane.showMessageDialog(null, "Error. Please try again.");
+                        return;
                     }
-                    System.out.println(sql);
+
+                    // update addCruise combobox
+                    addCruiseShipBox.addItem(Integer.toString(id));
+
+                    // reset fields
+                    ship2.setText(null);
+                    ship3.setText(null);
+                    ship4.setText(null);
+                    ship5.setText(null);
                 }
             }
         }
@@ -469,14 +500,18 @@ public class GuiFrame extends JFrame implements ActionListener{
                 try {
                     sq.executeUpdate(sql);
                     JOptionPane.showMessageDialog(null, "Success! Captain Added.");
-                    captain2.setText(null);
-                    captain3.setText(null);
-
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                     JOptionPane.showMessageDialog(null, "Error. Please try again.");
+                    return;
                 }
-                System.out.println(sql);
+
+                // update addCruise combobox
+                addCruiseCaptainBox.addItem(captain2.getText());
+
+                // reset fields
+                captain2.setText(null);
+                captain3.setText(null);
             }
         }
         if (index == 2) {
@@ -491,16 +526,17 @@ public class GuiFrame extends JFrame implements ActionListener{
                     JOptionPane.showMessageDialog(null, "Please Make Sure That Cost, Tickets Sold and Stops are Integer.");
                 } else {
                     String sql = "SELECT MAX(cnum) FROM cruise;";
-                    int id = 0;
+                    int cnum = 0;
                     try {
                         List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
                         int result = Integer.parseInt(rs.get(0).get(0));
-                        id = result + 1;
+                        cnum = result + 1;
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
+                        return;
                     }
                     sql = "INSERT INTO cruise (cnum, cost, num_sold, num_stops, actual_departure_date, actual_arrival_date, arrival_port, departure_port) VALUES ("
-                            + id + ", "
+                            + cnum + ", "
                             + cruise2.getText() + ", "
                             + cruise3.getText() + ", "
                             + cruise4.getText() + ", '"
@@ -511,17 +547,66 @@ public class GuiFrame extends JFrame implements ActionListener{
                     System.out.println(sql);
                     try {
                         sq.executeUpdate(sql);
-                        JOptionPane.showMessageDialog(null, "Success! Cruise Added.");
-                        cruise2.setText(null);
-                        cruise3.setText(null);
-                        cruise4.setText(null);
-                        cruise7.setText(null);
-                        cruise8.setText(null);
-
                     } catch (SQLException throwables) {
                         throwables.printStackTrace();
-                        JOptionPane.showMessageDialog(null, "Error. Please try again.");
+                        JOptionPane.showMessageDialog(null, "Error adding cruise. Please try again.");
+                        return;
                     }
+
+                    // add CruiseInfo
+                    int ship_id = Integer.parseInt(addCruiseShipBox.getSelectedItem().toString());
+                    String fullname = addCruiseCaptainBox.getSelectedItem().toString();
+
+                    // get captain id
+                    int captain_id;
+                    sql = "SELECT id FROM Captain WHERE fullname='"+fullname+"';";
+                    try {
+                        List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+                        try {
+                            captain_id = Integer.parseInt(rs.get(0).get(0));
+                        } catch(Exception e) {
+                            JOptionPane.showMessageDialog(null, "Captain not found");
+                            return;
+                        }
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                        return;
+                    }
+
+                    // get new ciid
+                    int ciid;
+                    sql = "SELECT MAX(ciid) FROM CruiseInfo;";
+                    try {
+                        List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+                        int result = Integer.parseInt(rs.get(0).get(0));
+                        ciid = result + 1;
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                        return;
+                    }
+
+                    // INSERT cruiseinfo
+                    sql = "INSERT INTO CruiseInfo (ciid, cruise_id, captain_id, ship_id) VALUES ("
+                            + ciid + ", "
+                            + cnum + ","
+                            + captain_id + ","
+                            + ship_id + ");";
+                    System.out.println(sql);
+                    try {
+                        sq.executeUpdate(sql);
+                        JOptionPane.showMessageDialog(null, "Success! Cruise Added.");
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Error add cruise info. Please try again.");
+                        return;
+                    }
+
+                    // reset fields
+                    cruise2.setText(null);
+                    cruise3.setText(null);
+                    cruise4.setText(null);
+                    cruise7.setText(null);
+                    cruise8.setText(null);
                 }
             }
         }

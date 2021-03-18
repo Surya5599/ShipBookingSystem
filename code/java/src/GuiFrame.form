@@ -328,7 +328,7 @@
                           </hspacer>
                         </children>
                       </grid>
-                      <grid id="6c224" binding="addCruise" layout-manager="GridLayoutManager" row-count="8" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                      <grid id="6c224" binding="addCruise" layout-manager="GridLayoutManager" row-count="10" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                         <margin top="0" left="0" bottom="0" right="0"/>
                         <constraints>
                           <card name="addCruise"/>
@@ -420,7 +420,7 @@
                           </component>
                           <vspacer id="17214">
                             <constraints>
-                              <grid row="7" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                              <grid row="9" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                             </constraints>
                           </vspacer>
                           <grid id="fbd66" binding="dt" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -491,6 +491,34 @@
                             </constraints>
                             <properties>
                               <text value="Arrival Time"/>
+                            </properties>
+                          </component>
+                          <component id="a82ef" class="javax.swing.JComboBox" binding="addCruiseShipBox">
+                            <constraints>
+                              <grid row="7" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties/>
+                          </component>
+                          <component id="8cef6" class="javax.swing.JLabel">
+                            <constraints>
+                              <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties>
+                              <text value="Ship"/>
+                            </properties>
+                          </component>
+                          <component id="fd079" class="javax.swing.JComboBox" binding="addCruiseCaptainBox">
+                            <constraints>
+                              <grid row="8" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties/>
+                          </component>
+                          <component id="3490c" class="javax.swing.JLabel">
+                            <constraints>
+                              <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                            </constraints>
+                            <properties>
+                              <text value="Captain"/>
                             </properties>
                           </component>
                         </children>
