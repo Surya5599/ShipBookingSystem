@@ -17,8 +17,9 @@
 ### Assumptions
 * Cruise.num_sold is equal to the amount of seats that we consider "unavailable"
 * Available Seats is only relevant for cruises that have not yet departed. Otherwise we assume there are no available seats
-* When adding a ship a user can add numeric info to Make and Model
-
+* When adding a ship a user can add new info for Make and Model that is not within the database, and allows for numeric input
+* When adding a cruise, a new ports information can be added and it can be numeric
+* 
 ---
 
 ### Modification to Schema
