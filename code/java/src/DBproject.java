@@ -300,7 +300,6 @@ public class DBproject{
         mygui.setLocationRelativeTo(null);
 		mygui.pack();
         mygui.setVisible(true);
-
 	}
 
 	public static int readChoice() {

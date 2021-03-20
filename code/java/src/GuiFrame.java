@@ -174,9 +174,11 @@ public class GuiFrame extends JFrame implements ActionListener {
     }
 
     private void initAddCruiseComboBoxes() {
+        addCruiseShipBox.removeAllItems();
+        addCruiseCaptainBox.removeAllItems();
         addCruiseShipBox.setEditable(true);
         addCruiseCaptainBox.setEditable(true);
-        String sql = "SELECT cnum FROM Cruise";
+        String sql = "SELECT id FROM Ship";
         try {
             List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
             // add all cnums to comboBox
@@ -199,6 +201,7 @@ public class GuiFrame extends JFrame implements ActionListener {
     }
 
     private void initBookingComboBox() {
+        bookMenuCombo.removeAllItems();
         bookMenuCombo.setEditable(true);
         String sql = "SELECT cnum FROM Cruise";
         try {
@@ -227,6 +230,7 @@ public class GuiFrame extends JFrame implements ActionListener {
     }
 
     private void initPassengerComboBox() {
+        passengerBox1.removeAllItems();
         passengerBox1.setEditable(true);
 
         String sql = "SELECT cnum FROM Cruise";
@@ -246,6 +250,7 @@ public class GuiFrame extends JFrame implements ActionListener {
     }
 
     private void initSeatComboBox() {
+        seatCruiseBox.removeAllItems();
         seatCruiseBox.setEditable(true);
 
         String sql = "SELECT cnum FROM Cruise";
@@ -299,6 +304,7 @@ public class GuiFrame extends JFrame implements ActionListener {
         menu2.add(i7);
         jb.add(menu1);
         jb.add(menu2);
+        //table1.setAutoCreateRowSorter(true);
 
         return jb;
     }
@@ -312,6 +318,7 @@ public class GuiFrame extends JFrame implements ActionListener {
             cl.show(Holder, "addCaptain");
         }
         if (item.equals("Cruise")) {
+            initAddCruiseComboBoxes();
             cl.show(Holder, "addCruise");
         }
     }
@@ -396,10 +403,16 @@ public class GuiFrame extends JFrame implements ActionListener {
             cl.show(panelHolder, "mainMenu");
         else if (item.equals("Add Data"))
             cl.show(panelHolder, "addMenu");
-        else if (item.equals("Book a Cruise"))
+        else if (item.equals("Book a Cruise")) {
+            bookField1.setText(null);
+            bookField2.setText(null);
+            initBookingComboBox();
             cl.show(panelHolder, "bookMenu");
-        else if (item.equals("Available Seats"))
+        }
+        else if (item.equals("Available Seats")) {
+            initSeatComboBox();
             cl.show(panelHolder, "seatsMenu");
+        }
         else if (item.equals("Repairs Info")) {
             cl.show(panelHolder, "repairMenu");
             try {
@@ -409,8 +422,15 @@ public class GuiFrame extends JFrame implements ActionListener {
             }
         } else if (item.equals("Passengers Info"))
             cl.show(panelHolder, "passengerMenu");
-        else if (item.equals("View Data"))
+        else if (item.equals("View Data")){
+            try {
+                createTable("Captain");
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
             cl.show(panelHolder, "dataMenu");
+        }
+
         else if (item.equals("Quit"))
             this.dispose();
     }
@@ -522,6 +542,10 @@ public class GuiFrame extends JFrame implements ActionListener {
             } else {
                 if (!isNumeric(cruise2.getText()) || !isNumeric(cruise3.getText()) || !isNumeric(cruise4.getText())) {
                     JOptionPane.showMessageDialog(null, "Please Make Sure That Cost, Tickets Sold and Stops are Integer.");
+                    return;
+                } if (cruise7.getText().length() != 5 || cruise8.getText().length() != 5) {
+                    JOptionPane.showMessageDialog(null, "Please Make Sure That Departure Port and Arrival Port have 5 characters.");
+                    return;
                 } else {
                     String sql = "SELECT MAX(cnum) FROM cruise;";
                     int cnum = 0;
@@ -767,9 +791,7 @@ public class GuiFrame extends JFrame implements ActionListener {
         at_time.setEditor(new JSpinner.DateEditor(at_date, "HH:mm"));
 
         seatDate = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.MONTH));
-        //seatTime = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.HOUR_OF_DAY));
-        seatDate.setEditor(new JSpinner.DateEditor(at_date, "dd/MM/yy"));
-        //seatTime.setEditor(new JSpinner.DateEditor(at_date, "HH:mm"));
+        seatDate.setEditor(new JSpinner.DateEditor(seatDate, "dd/MM/yy"));
     }
 
 }

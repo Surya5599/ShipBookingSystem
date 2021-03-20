@@ -88,6 +88,14 @@ public class customerInfo extends JDialog {
             String bday = getString(cust6);
             String phone = cust7.getText();
             String zip = cust8.getText();
+            if(phone.length() != 10 || !isNumeric(phone)){
+                JOptionPane.showMessageDialog(null, "Please Make Sure The Phone Number has 10 numbers and no characters");
+                return;
+            }
+            if(zip.length() != 5 || !isNumeric(zip)){
+                JOptionPane.showMessageDialog(null, "Please Make Sure The Zip Code has 5 numbers and no characters");
+                return;
+            }
             sql = "INSERT INTO customer (id, fname, lname, gtype, dob, address, phone, zipcode) VALUES ("
                     + id + ", '"
                     + fname + "', '"
@@ -108,6 +116,15 @@ public class customerInfo extends JDialog {
             }
         }
         dispose();
+    }
+
+    public static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     private String getString(JPanel pan) {
