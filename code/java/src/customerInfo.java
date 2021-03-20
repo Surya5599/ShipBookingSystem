@@ -60,7 +60,7 @@ public class customerInfo extends JDialog {
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
-
+    //when the submit button is pressed
     private void onOK() {
         // add your code here
         if (cust1.getText().isEmpty()
@@ -118,6 +118,7 @@ public class customerInfo extends JDialog {
         dispose();
     }
 
+    //check if string is numeric
     public static boolean isNumeric(String str) {
         try {
             Double.parseDouble(str);
@@ -127,6 +128,7 @@ public class customerInfo extends JDialog {
         }
     }
 
+    //change date to string
     private String getString(JPanel pan) {
         DateFormat d1 = new SimpleDateFormat("yyyy-MM-dd");
         Date date = (Date) ((JSpinner) pan.getComponent(0)).getValue();
@@ -134,12 +136,12 @@ public class customerInfo extends JDialog {
         return d;
     }
 
-
+    //when they press cancel button
     private void onCancel() {
         // add your code here if necessary
         dispose();
     }
-
+    //custom UI set up
     private void createUIComponents() {
         dob = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.MONTH));
         //seatTime = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.HOUR_OF_DAY));

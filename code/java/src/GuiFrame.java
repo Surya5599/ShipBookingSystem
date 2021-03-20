@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -432,8 +433,13 @@ public class GuiFrame extends JFrame implements ActionListener {
      */
     public void actionPerformed(ActionEvent e) {
         String item = e.getActionCommand();
-        if (item.equals("addButton"))
-            addData();
+        if (item.equals("addButton")) {
+            try {
+                addData();
+            } catch (ParseException parseException) {
+                parseException.printStackTrace();
+            }
+        }
         else if (item.equals("bookButton"))
             bookCruise();
         else if (item.equals("seatButton"))
@@ -507,7 +513,7 @@ public class GuiFrame extends JFrame implements ActionListener {
      * index = 1 for captain
      * index = 2 for cruise
      */
-    public void addData() {
+    public void addData() throws ParseException {
         int index = addMenuCombo.getSelectedIndex();
         if (index == 0) {
             if (ship2.getText().isEmpty()
@@ -598,6 +604,11 @@ public class GuiFrame extends JFrame implements ActionListener {
                 }if (cruise7.getText().length() != 5 || cruise8.getText().length() != 5) {
                     JOptionPane.showMessageDialog(null, "Please Make Sure That Departure Port and Arrival Port have 5 characters.");
                     return;
+                }
+                if (!checkDate(dt, at)) {
+                    JOptionPane.showMessageDialog(null, "Please Make Sure That departure is before arrival.");
+                    return;
+
                 } else {
                     String sql = "SELECT MAX(cnum) FROM cruise;";
                     int cnum = 0;
@@ -684,6 +695,16 @@ public class GuiFrame extends JFrame implements ActionListener {
                 }
             }
         }
+    }
+
+    private boolean checkDate(JPanel dt, JPanel at) throws ParseException {
+        DateFormat dform = new SimpleDateFormat("yyyy-MM-dd");
+        Date date1 = dform.parse(getString(dt));
+        Date date2 = dform.parse(getString(at));
+        if(date1.compareTo(date2) > 0){
+            return false;
+        }
+        return true;
     }
 
     /*
