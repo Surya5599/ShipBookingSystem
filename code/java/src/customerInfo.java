@@ -150,8 +150,8 @@ public class customerInfo extends JDialog {
     private void createUIComponents() {
         dob = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.MONTH));
         //seatTime = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.HOUR_OF_DAY));
-        dob.setEditor(new JSpinner.DateEditor(dob, "dd/MM/yy"));
-        dob.setEditor(new JSpinner.DateEditor(dob, "dd/MM/yy"));
+        dob.setEditor(new JSpinner.DateEditor(dob, "dd/MM/yyyy"));
+        dob.setEditor(new JSpinner.DateEditor(dob, "dd/MM/yyyy"));
     }
 
     /**
