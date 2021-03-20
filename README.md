@@ -17,6 +17,7 @@
 ### Assumptions
 * Cruise.num_sold is equal to the amount of seats that we consider "unavailable"
 * Available Seats is only relevant for cruises that have not yet departed. Otherwise we assume there are no available seats
+* When adding a ship a user can add numeric info to Make and Model
 
 ---
 
