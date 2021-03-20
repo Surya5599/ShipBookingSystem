@@ -2,6 +2,7 @@
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.plaf.FontUIResource;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -18,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import javax.swing.JPanel;
+import javax.swing.text.StyleContext;
 
 public class GuiFrame extends JFrame implements ActionListener {
 
@@ -174,8 +176,6 @@ public class GuiFrame extends JFrame implements ActionListener {
         seatButton.setActionCommand("seatButton");
         bookButton.addActionListener(this);
         bookButton.setActionCommand("bookButton");
-
-
     }
 
     /*
@@ -185,8 +185,6 @@ public class GuiFrame extends JFrame implements ActionListener {
     private void initAddCruiseComboBoxes() {
         addCruiseShipBox.removeAllItems();
         addCruiseCaptainBox.removeAllItems();
-        addCruiseShipBox.setEditable(true);
-        addCruiseCaptainBox.setEditable(true);
         String sql = "SELECT id FROM Ship ORDER BY id ASC";
         try {
             List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
@@ -1080,6 +1078,9 @@ public class GuiFrame extends JFrame implements ActionListener {
         arr_time.setText("Arrival Time");
         addCruise.add(arr_time, new com.intellij.uiDesigner.core.GridConstraints(4, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_EAST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         addCruiseShipBox = new JComboBox();
+        addCruiseShipBox.setEditable(false);
+        final DefaultComboBoxModel defaultComboBoxModel2 = new DefaultComboBoxModel();
+        addCruiseShipBox.setModel(defaultComboBoxModel2);
         addCruise.add(addCruiseShipBox, new com.intellij.uiDesigner.core.GridConstraints(7, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label14 = new JLabel();
         label14.setText("Ship");
@@ -1108,25 +1109,25 @@ public class GuiFrame extends JFrame implements ActionListener {
         dataMenuCombo = new JComboBox();
         dataMenuCombo.setInheritsPopupMenu(false);
         dataMenuCombo.setMaximumRowCount(10);
-        final DefaultComboBoxModel defaultComboBoxModel2 = new DefaultComboBoxModel();
-        defaultComboBoxModel2.addElement("Captains");
-        defaultComboBoxModel2.addElement("Cruise Info");
-        defaultComboBoxModel2.addElement("Cruises");
-        defaultComboBoxModel2.addElement("Customers");
-        defaultComboBoxModel2.addElement("Repairs");
-        defaultComboBoxModel2.addElement("Reservations");
-        defaultComboBoxModel2.addElement("Schedules");
-        defaultComboBoxModel2.addElement("Ships");
-        defaultComboBoxModel2.addElement("Technicians");
-        dataMenuCombo.setModel(defaultComboBoxModel2);
+        final DefaultComboBoxModel defaultComboBoxModel3 = new DefaultComboBoxModel();
+        defaultComboBoxModel3.addElement("Captains");
+        defaultComboBoxModel3.addElement("Cruise Info");
+        defaultComboBoxModel3.addElement("Cruises");
+        defaultComboBoxModel3.addElement("Customers");
+        defaultComboBoxModel3.addElement("Repairs");
+        defaultComboBoxModel3.addElement("Reservations");
+        defaultComboBoxModel3.addElement("Schedules");
+        defaultComboBoxModel3.addElement("Ships");
+        defaultComboBoxModel3.addElement("Technicians");
+        dataMenuCombo.setModel(defaultComboBoxModel3);
         dataMenuCombo.setSelectedIndex(0);
         dataMenu.add(dataMenuCombo, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         bookMenu = new JPanel();
         bookMenu.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(7, 3, new Insets(100, 100, 100, 100), -1, -1));
         panelHolder.add(bookMenu, "bookMenu");
         bookMenuCombo = new JComboBox();
-        final DefaultComboBoxModel defaultComboBoxModel3 = new DefaultComboBoxModel();
-        bookMenuCombo.setModel(defaultComboBoxModel3);
+        final DefaultComboBoxModel defaultComboBoxModel4 = new DefaultComboBoxModel();
+        bookMenuCombo.setModel(defaultComboBoxModel4);
         bookMenu.add(bookMenuCombo, new com.intellij.uiDesigner.core.GridConstraints(3, 1, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final com.intellij.uiDesigner.core.Spacer spacer15 = new com.intellij.uiDesigner.core.Spacer();
         bookMenu.add(spacer15, new com.intellij.uiDesigner.core.GridConstraints(5, 2, 2, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_VERTICAL, 1, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
@@ -1201,8 +1202,8 @@ public class GuiFrame extends JFrame implements ActionListener {
         seatsMenu.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(6, 2, new Insets(100, 100, 100, 100), -1, -1));
         panelHolder.add(seatsMenu, "seatsMenu");
         seatCruiseBox = new JComboBox();
-        final DefaultComboBoxModel defaultComboBoxModel4 = new DefaultComboBoxModel();
-        seatCruiseBox.setModel(defaultComboBoxModel4);
+        final DefaultComboBoxModel defaultComboBoxModel5 = new DefaultComboBoxModel();
+        seatCruiseBox.setModel(defaultComboBoxModel5);
         seatsMenu.add(seatCruiseBox, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label28 = new JLabel();
         label28.setText("Cruise Number");
@@ -1287,7 +1288,10 @@ public class GuiFrame extends JFrame implements ActionListener {
                 resultName = currentFont.getName();
             }
         }
-        return new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
+        Font font = new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
+        boolean isMac = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).startsWith("mac");
+        Font fontWithFallback = isMac ? new Font(font.getFamily(), font.getStyle(), font.getSize()) : new StyleContext().getFont(font.getFamily(), font.getStyle(), font.getSize());
+        return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
     }
 
     /**
@@ -1296,6 +1300,7 @@ public class GuiFrame extends JFrame implements ActionListener {
     public JComponent $$$getRootComponent$$$() {
         return mainPanel;
     }
+
 }
 
 
