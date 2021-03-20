@@ -11,6 +11,8 @@
     * Allows for the easy creation of new customers when booking 
 * Error specific pop-ups 
     * In order to make the GUI more user-friendly
+* Show next available cruise if no cruise found on date
+   * Allows a user to know a valid date for a cruise if they enter a date before the departure date of a cruise  
     
 ---
 
