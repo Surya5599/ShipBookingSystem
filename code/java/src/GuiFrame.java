@@ -815,20 +815,17 @@ public class GuiFrame extends JFrame implements ActionListener {
         }
         System.out.println(sql);
 
-        /*sql = "SELECT actual_departure_date FROM Cruise WHERE cnum=" + cnum;
+        sql = "SELECT actual_departure_date FROM Cruise WHERE cnum=" + cnum;
         try {
             List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd-MM-yyyy");
             Date departure_date;
             try {
                 departure_date = dateFormat.parse(rs.get(0).get(0));
-                Date d2 = dateFormat2.parse(dateFormat2.format((Date) seatDate.getValue()));
-                System.out.println("seatDate.getValue():" + d2);
-                //if (departure_date.compareTo(d2) < 0) {
-                //    JOptionPane.showMessageDialog(null, "This date is after the cruise has departed.");
-                //    return;
-                //}
+                if (departure_date.compareTo(date) < 0) {
+                    JOptionPane.showMessageDialog(null, "This date is after the cruise has departed.");
+                    return;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 return;
@@ -837,7 +834,7 @@ public class GuiFrame extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(null, "Could not retrieve Cruise info (internal error)");
             throwables.printStackTrace();
             return;
-        }*/
+        }
 
         seatNumField.setText(String.valueOf(n_ship_seats - n_reserved));
         seatReservedField.setText(n_reserved + " / " + n_ship_seats);
