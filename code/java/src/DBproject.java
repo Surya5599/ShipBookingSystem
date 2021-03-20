@@ -294,11 +294,17 @@ public class DBproject{
 			}
 		}
 	}
-
+	/**
+	 * this creates the GUI and shows it calling the GUIFRAME
+	 */
 	private static void createGui(DBproject esql) throws IOException, SQLException {
+
 		GuiFrame mygui = new GuiFrame(esql);
         mygui.setLocationRelativeTo(null);
+        mygui.setTitle("");
 		mygui.pack();
+		ImageIcon img = new ImageIcon("code/java/src/img/cruise.png");
+		mygui.setIconImage(img.getImage());
         mygui.setVisible(true);
 	}
 

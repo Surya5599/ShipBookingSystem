@@ -89,6 +89,7 @@ public class GuiFrame extends JFrame implements ActionListener {
     private JLabel dPort;
     private JComboBox addCruiseShipBox;
     private JComboBox addCruiseCaptainBox;
+    private JPanel seatPanel;
     private CardLayout cl;
     DBproject sq;
 
@@ -171,6 +172,8 @@ public class GuiFrame extends JFrame implements ActionListener {
         seatButton.setActionCommand("seatButton");
         bookButton.addActionListener(this);
         bookButton.setActionCommand("bookButton");
+
+
     }
 
     /*
@@ -592,6 +595,9 @@ public class GuiFrame extends JFrame implements ActionListener {
                 } if (cruise7.getText().length() != 5 || cruise8.getText().length() != 5) {
                     JOptionPane.showMessageDialog(null, "Please Make Sure That Departure Port and Arrival Port have 5 characters.");
                     return;
+                }if (cruise7.getText().length() != 5 || cruise8.getText().length() != 5) {
+                    JOptionPane.showMessageDialog(null, "Please Make Sure That Departure Port and Arrival Port have 5 characters.");
+                    return;
                 } else {
                     String sql = "SELECT MAX(cnum) FROM cruise;";
                     int cnum = 0;
@@ -782,14 +788,17 @@ public class GuiFrame extends JFrame implements ActionListener {
 
     private void findNumSeats() {
         // ensure all fields are entered
-        if (seatDate.getValue() == null || seatCruiseBox.getSelectedItem() == null) {
+        if (seatCruiseBox.getSelectedItem() == null) {
             JOptionPane.showMessageDialog(null, "Please Complete All Fields");
             return;
         }
 
         int cnum = Integer.parseInt(seatCruiseBox.getSelectedItem().toString());
         int n_reserved = 0, n_ship_seats = 0;
-
+        DateFormat d1 = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = (Date) ((JSpinner) seatPanel.getComponent(0)).getValue();
+        String d = d1.format(date);
+        System.out.println(d);  /**DATE RIGHT HERE*/
         // find num_sold, # of seats
         String sql = "SELECT num_sold FROM Cruise WHERE cnum=" + cnum
                 + " UNION "
@@ -862,7 +871,7 @@ public class GuiFrame extends JFrame implements ActionListener {
         at_date = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.MONTH));
         at_time = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.HOUR_OF_DAY));
         at_date.setEditor(new JSpinner.DateEditor(at_date, "dd/MM/yy"));
-        at_time.setEditor(new JSpinner.DateEditor(at_date, "HH:mm"));
+        at_time.setEditor(new JSpinner.DateEditor(at_time, "HH:mm"));
 
         seatDate = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.MONTH));
         seatDate.setEditor(new JSpinner.DateEditor(seatDate, "dd/MM/yy"));
