@@ -9,6 +9,8 @@
   * Allows for the population of the CruiseInfo table, making the cruise available for use by other functions
 * Pop-up to create customer if customer does not exist on file when booking a cruise
     * Allows for the easy creation of new customers when booking 
+* Error specific pop-ups 
+    * In order to make the GUI more user-friendly
     
 ---
 
