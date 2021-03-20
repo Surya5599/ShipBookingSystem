@@ -173,12 +173,16 @@ public class GuiFrame extends JFrame implements ActionListener {
         bookButton.setActionCommand("bookButton");
     }
 
+    /*
+     * pulls relevant date for the combo boxes
+     * in the add cruise menu
+     */
     private void initAddCruiseComboBoxes() {
         addCruiseShipBox.removeAllItems();
         addCruiseCaptainBox.removeAllItems();
         addCruiseShipBox.setEditable(true);
         addCruiseCaptainBox.setEditable(true);
-        String sql = "SELECT id FROM Ship";
+        String sql = "SELECT id FROM Ship ORDER BY id ASC";
         try {
             List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
             // add all cnums to comboBox
@@ -188,7 +192,7 @@ public class GuiFrame extends JFrame implements ActionListener {
             System.out.println("SQL error in initAddCruiseComboBoxes()");
             throwables.printStackTrace();
         }
-        sql = "SELECT fullname FROM Captain";
+        sql = "SELECT fullname FROM Captain ORDER BY fullname ASC";
         try {
             List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
             // add all names to comboBox
@@ -200,10 +204,14 @@ public class GuiFrame extends JFrame implements ActionListener {
         }
     }
 
+    /*
+     * populates cruise number combo box for
+     * the booking menu
+     */
     private void initBookingComboBox() {
         bookMenuCombo.removeAllItems();
         bookMenuCombo.setEditable(true);
-        String sql = "SELECT cnum FROM Cruise";
+        String sql = "SELECT cnum FROM Cruise ORDER BY cnum ASC";
         try {
             List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
             // add all cnums to comboBox
@@ -216,6 +224,9 @@ public class GuiFrame extends JFrame implements ActionListener {
         }
     }
 
+    /*
+     * fills relevant cruise data for the booking menu
+     */
     private void fillCruiseInfo(int x) throws SQLException {
         String sql = "SELECT * FROM Cruise where cnum = " + x;
         List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
@@ -229,11 +240,15 @@ public class GuiFrame extends JFrame implements ActionListener {
         dPort.setText(String.valueOf(first.get(7)));
     }
 
+    /*
+     * retrieves cruise numbers for populating
+     * gui in num passenger menu
+     */
     private void initPassengerComboBox() {
         passengerBox1.removeAllItems();
         passengerBox1.setEditable(true);
 
-        String sql = "SELECT cnum FROM Cruise";
+        String sql = "SELECT cnum FROM Cruise ORDER BY cnum ASC";
         try {
             List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
             // add all cnums to comboBox
@@ -249,11 +264,15 @@ public class GuiFrame extends JFrame implements ActionListener {
         passengerBox2.addItem("Completed");
     }
 
+    /*
+     * retrieves cruise numbers for population combo box
+     * in the available seats menu
+     */
     private void initSeatComboBox() {
         seatCruiseBox.removeAllItems();
         seatCruiseBox.setEditable(true);
 
-        String sql = "SELECT cnum FROM Cruise";
+        String sql = "SELECT cnum FROM Cruise ORDER BY cnum ASC";
         try {
             List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
             // add all cnums to comboBox
@@ -265,6 +284,9 @@ public class GuiFrame extends JFrame implements ActionListener {
         }
     }
 
+    /*
+     * creates gui menu
+     */
     public JMenuBar createMenuBar() {
         JMenuBar jb = new JMenuBar();
         JMenu menu2;
@@ -309,6 +331,9 @@ public class GuiFrame extends JFrame implements ActionListener {
         return jb;
     }
 
+    /*
+     * shows correct add data menu depending on selected item
+     */
     public void showTable(String item) {
         CardLayout cl = (CardLayout) Holder.getLayout();
         if (item.equals("Ship")) {
@@ -323,6 +348,10 @@ public class GuiFrame extends JFrame implements ActionListener {
         }
     }
 
+    /*
+     * creates data table for the view data menu
+     * just gets selected table and places them into java tables
+     */
     public void createTable(String item) throws SQLException {
         DefaultTableModel tableModel = (DefaultTableModel) table1.getModel();
         table1.setEnabled(false);
@@ -375,6 +404,10 @@ public class GuiFrame extends JFrame implements ActionListener {
         }
     }
 
+    /*
+     * looks up and then displays number of passengers
+     * for given cruise and reservation status
+     */
     public void createNumPassengers() {
         if (passengerBox1.getSelectedItem() == null || passengerBox2.getSelectedItem() == null)
             return;
@@ -390,6 +423,10 @@ public class GuiFrame extends JFrame implements ActionListener {
     }
 
 
+    /*
+     * all GUI event handlers
+     * calls relevant functions
+     */
     public void actionPerformed(ActionEvent e) {
         String item = e.getActionCommand();
         if (item.equals("addButton"))
@@ -435,6 +472,9 @@ public class GuiFrame extends JFrame implements ActionListener {
             this.dispose();
     }
 
+    /* creates, populates, and shows repair list
+     * ordered with SQL and displayed in java table
+     */
     private void showRepairsList() throws SQLException {
         String sql = "SELECT R.ship_id, COUNT(R.ship_id) as total_repairs, S.make, S.model, S.age, S.seats from repairs R, ship S WHERE S.id = R.ship_id GROUP BY R.ship_id, S.make, S.model,S.seats, S.age ORDER BY COUNT(R.ship_id) desc;";
         ResultSet result = sq.executeQueryAndReturnResultWithColumn(sql);
@@ -458,6 +498,12 @@ public class GuiFrame extends JFrame implements ActionListener {
         }
     }
 
+    /*
+     * holds logic for all add data forms
+     * index = 0 for ship
+     * index = 1 for captain
+     * index = 2 for cruise
+     */
     public void addData() {
         int index = addMenuCombo.getSelectedIndex();
         if (index == 0) {
@@ -634,6 +680,11 @@ public class GuiFrame extends JFrame implements ActionListener {
         }
     }
 
+    /*
+     * processes booking cruise information
+     * pulls data from application interface, and sends to DB
+     * INSERTs reservation for relevant customer
+     */
     public void bookCruise() {
         // ensure all fields are entered
         System.out.println(bookMenuCombo.getSelectedItem());
@@ -652,7 +703,6 @@ public class GuiFrame extends JFrame implements ActionListener {
         // get ccid (customer id)
         String sql = "SELECT c.id FROM Customer c WHERE c.fname='" + bookField1.getText() + "' AND c.lname='" + bookField2.getText() + "';";
         try {
-            // TODO - send message dialog when customer not found in DB
             List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
             try {
                 ccid = Integer.parseInt(rs.get(0).get(0));
@@ -755,6 +805,30 @@ public class GuiFrame extends JFrame implements ActionListener {
             return;
         }
         System.out.println(sql);
+
+        /*sql = "SELECT actual_departure_date FROM Cruise WHERE cnum=" + cnum;
+        try {
+            List<List<String>> rs = sq.executeQueryAndReturnResult(sql);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat dateFormat2 = new SimpleDateFormat("dd-MM-yyyy");
+            Date departure_date;
+            try {
+                departure_date = dateFormat.parse(rs.get(0).get(0));
+                Date d2 = dateFormat2.parse(dateFormat2.format((Date) seatDate.getValue()));
+                System.out.println("seatDate.getValue():" + d2);
+                //if (departure_date.compareTo(d2) < 0) {
+                //    JOptionPane.showMessageDialog(null, "This date is after the cruise has departed.");
+                //    return;
+                //}
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
+        } catch (SQLException throwables) {
+            JOptionPane.showMessageDialog(null, "Could not retrieve Cruise info (internal error)");
+            throwables.printStackTrace();
+            return;
+        }*/
 
         seatNumField.setText(String.valueOf(n_ship_seats - n_reserved));
         seatReservedField.setText(n_reserved + " / " + n_ship_seats);
