@@ -193,7 +193,7 @@ public class GuiFrame extends JFrame implements ActionListener {
             for (List<String> ls : rs)
                 addCruiseShipBox.addItem(ls.get(0));
         } catch (SQLException throwables) {
-            System.out.println("SQL error in initAddCruiseComboBoxes()");
+//            System.out.println("SQL error in initAddCruiseComboBoxes()");
             throwables.printStackTrace();
         }
         sql = "SELECT fullname FROM Captain ORDER BY fullname ASC";
@@ -203,7 +203,7 @@ public class GuiFrame extends JFrame implements ActionListener {
             for (List<String> ls : rs)
                 addCruiseCaptainBox.addItem(ls.get(0));
         } catch (SQLException throwables) {
-            System.out.println("SQL error in initAddCruiseComboBoxes()");
+//            System.out.println("SQL error in initAddCruiseComboBoxes()");
             throwables.printStackTrace();
         }
     }
@@ -223,7 +223,7 @@ public class GuiFrame extends JFrame implements ActionListener {
                 bookMenuCombo.addItem(ls.get(0));
             fillCruiseInfo(0);
         } catch (SQLException throwables) {
-            System.out.println("SQL error in initBookingComboBox()");
+//            System.out.println("SQL error in initBookingComboBox()");
             throwables.printStackTrace();
         }
     }
@@ -259,7 +259,7 @@ public class GuiFrame extends JFrame implements ActionListener {
             for (List<String> ls : rs)
                 passengerBox1.addItem(ls.get(0));
         } catch (SQLException throwables) {
-            System.out.println("SQL error in initPassengerComboBox()");
+//            System.out.println("SQL error in initPassengerComboBox()");
             throwables.printStackTrace();
         }
 
@@ -283,7 +283,7 @@ public class GuiFrame extends JFrame implements ActionListener {
             for (List<String> ls : rs)
                 seatCruiseBox.addItem(ls.get(0));
         } catch (SQLException throwables) {
-            System.out.println("SQL error in initSeatComboBox()");
+//            System.out.println("SQL error in initSeatComboBox()");
             throwables.printStackTrace();
         }
     }
@@ -629,7 +629,7 @@ public class GuiFrame extends JFrame implements ActionListener {
                             + getString(at) + "', '"
                             + cruise7.getText() + "', '"
                             + cruise8.getText() + "');";
-                    System.out.println(sql);
+//                    System.out.println(sql);
                     try {
                         sq.executeUpdate(sql);
                     } catch (SQLException throwables) {
@@ -676,7 +676,7 @@ public class GuiFrame extends JFrame implements ActionListener {
                             + cnum + ","
                             + captain_id + ","
                             + ship_id + ");";
-                    System.out.println(sql);
+//                    System.out.println(sql);
                     try {
                         sq.executeUpdate(sql);
                         JOptionPane.showMessageDialog(null, "Success! Cruise Added.");
@@ -714,7 +714,7 @@ public class GuiFrame extends JFrame implements ActionListener {
      */
     public void bookCruise() {
         // ensure all fields are entered
-        System.out.println(bookMenuCombo.getSelectedItem());
+//        System.out.println(bookMenuCombo.getSelectedItem());
         if (bookField1.getText().isEmpty()
                 || bookField2.getText().isEmpty()
                 || bookMenuCombo.getSelectedItem() == null) {
@@ -804,7 +804,7 @@ public class GuiFrame extends JFrame implements ActionListener {
             throwables.printStackTrace();
             return;
         }
-        System.out.println(sql);
+//        System.out.println(sql);
     }
 
     private void findNumSeats() {
@@ -819,7 +819,7 @@ public class GuiFrame extends JFrame implements ActionListener {
         DateFormat d1 = new SimpleDateFormat("yyyy-MM-dd");
         Date date = (Date) ((JSpinner) seatPanel.getComponent(0)).getValue();
         String d = d1.format(date);
-        System.out.println(d);  /**DATE RIGHT HERE*/
+//        System.out.println(d);  /**DATE RIGHT HERE*/
         // find num_sold, # of seats
         String sql = "SELECT num_sold FROM Cruise WHERE cnum=" + cnum
                 + " UNION "
@@ -834,7 +834,7 @@ public class GuiFrame extends JFrame implements ActionListener {
             throwables.printStackTrace();
             return;
         }
-        System.out.println(sql);
+//        System.out.println(sql);
 
         sql = "SELECT actual_departure_date FROM Cruise WHERE cnum=" + cnum;
         try {

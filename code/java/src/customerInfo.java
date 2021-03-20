@@ -105,7 +105,7 @@ public class customerInfo extends JDialog {
                     + address + "', '"
                     + phone + "', '"
                     + zip + "');";
-            System.out.println(sql);
+//            System.out.println(sql);
             try {
                 sq.executeUpdate(sql);
                 JOptionPane.showMessageDialog(null, "Success! Customer Added.");

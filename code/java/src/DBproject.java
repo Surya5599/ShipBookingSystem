@@ -39,15 +39,15 @@ public class DBproject{
 	static BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 	
 	public DBproject(String dbname, String dbport, String user, String passwd) throws SQLException {
-		System.out.print("Connecting to database...");
+		//System.out.print("Connecting to database...");
 		try{
 			// constructs the connection URL
 			String url = "jdbc:postgresql://127.0.0.1:" + dbport + "/" + dbname;
-			System.out.println ("Connection URL: " + url + "\n");
+			//System.out.println ("Connection URL: " + url + "\n");
 			
 			// obtain a physical connection
 	        this._connection = DriverManager.getConnection(url, user, passwd);
-	        System.out.println("Done");
+	        //System.out.println("Done");
 		}catch(Exception e){
 			System.err.println("Error - Unable to Connect to Database: " + e.getMessage());
 	        System.out.println("Make sure you started postgres on this machine");
@@ -236,8 +236,6 @@ public class DBproject{
 		DBproject esql = null;
 		
 		try{
-			System.out.println("(1)");
-			
 			try {
 				Class.forName("org.postgresql.Driver");
 			}catch(Exception e){
@@ -246,8 +244,6 @@ public class DBproject{
 				e.printStackTrace();
 				return;
 			}
-			
-			System.out.println("(2)");
 			String dbname = args[0];
 			String dbport = args[1];
 			String user = args[2];
@@ -258,7 +254,7 @@ public class DBproject{
 			boolean keepon = true;
 			while(keepon){
 
-				System.out.println("MAIN MENU");
+				/*System.out.println("MAIN MENU");
 				System.out.println("---------");
 				System.out.println("1. Add Ship");
 				System.out.println("2. Add Captain");
@@ -267,7 +263,7 @@ public class DBproject{
 				System.out.println("5. List number of available seats for a given Cruise.");
 				System.out.println("6. List total number of repairs per Ship in descending order");
 				System.out.println("7. Find total number of passengers with a given status");
-				System.out.println("8. < EXIT");
+				System.out.println("8. < EXIT");*/
 				
 				switch (readChoice()){
 					case 1: AddShip(esql); break;
@@ -285,9 +281,9 @@ public class DBproject{
 		}finally{
 			try{
 				if(esql != null) {
-					System.out.print("Disconnecting from database...");
+					//System.out.print("Disconnecting from database...");
 					esql.cleanup ();
-					System.out.println("Done\n\nBye !");
+					//System.out.println("Done\n\nBye !");
 				}//end if				
 			}catch(Exception e){
 				// ignored.
@@ -312,7 +308,7 @@ public class DBproject{
 		int input;
 		// returns only if a correct value is given.
 		do {
-			System.out.print("Please make your choice: ");
+			//System.out.print("Please make your choice: ");
 			try { // read the integer, parse it and break.
 				input = Integer.parseInt(in.readLine());
 				break;
