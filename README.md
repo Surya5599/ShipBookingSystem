@@ -1,5 +1,5 @@
 
-# CS166 Final Project - Cruise Management System
+# Database/Application Final Project - Cruise Management System
 
 ## Table of Contents
 - [Project Overview](#project-overview)
