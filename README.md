@@ -86,13 +86,5 @@ This will launch the Cruise Management System GUI.
 - The system allows you to manage cruises, schedules, reservations, and customer information via the graphical interface.
 - Data for ships, captains, cruises, and reservations are preloaded from CSV files located in the `data/` directory.
 
-## Color Scheme
-This section describes the color palette used (optional, for future development):
-- **Primary Color**: `#2E86C1` (Deep Sky Blue) for navigation bars and buttons.
-- **Secondary Color**: `#D4E6F1` (Light Blue) for the background and UI elements.
-- **Accent Color**: `#F1C40F` (Bright Yellow) for highlights and important action buttons.
-- **Text Color**: `#34495E` (Dark Grey) for main text.
-- **Error Color**: `#E74C3C` (Red) for error messages and alerts.
-
 ## Credits
 This project was developed by Surya Singh as part of the CS166 course project.
